@@ -2,146 +2,15 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>观我生样书</title>
-<meta name="description" content="《观我生》第七版样书：三张虚构的测试盘，各一函两册，截自电脑上的阅读器。">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
-<style>
-:root {
-  /* 和书里同一张月白底：书居中占满，上面一条选盘选册，下面一条翻页 */
-  --paper: #eceef0;
-  --leaf: #fbfbfc;
-  --ink: #16191c;
-  --ink-2: #5d636a;
-  --line: #d2d6d9;
-  --zhu: #a42d1d;
-  --brush: "Ma Shan Zheng", "STKaiti", "KaiTi", serif;
-  --kai: "LXGW WenKai", "STKaiti", "KaiTi", "Songti SC", serif;
-  color-scheme: light;
-}
-* { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
-body { display: flex; flex-direction: column; background: radial-gradient(90% 72% at 50% 44%, #fbfbfc, #f0f2f3 62%, #e2e5e7) fixed, var(--paper); color: var(--ink); font-family: var(--kai); -webkit-font-smoothing: antialiased; }
-button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--zhu); outline-offset: 2px; }
-
-header { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px 20px 8px; }
-h1 { margin: 0; font-family: var(--brush); font-weight: 400; font-size: 30px; line-height: 1; letter-spacing: .14em; }
-.note { font-size: 12.5px; color: var(--ink-2); letter-spacing: .06em; }
-.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .7); box-shadow: inset 0 0 0 1px var(--line); }
-.seg button { padding: 4px 14px; border-radius: 999px; font-size: 14px; letter-spacing: .08em; color: var(--ink-2); }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--leaf); }
-.pillars { font-family: var(--brush); font-size: 18px; letter-spacing: .12em; color: var(--ink-2); }
-.spacer { flex: 1; }
-
-main { position: relative; flex: 1; min-height: 0; display: grid; place-items: center; padding: 0 12px; touch-action: pan-y pinch-zoom; }
-main img { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 18px 26px rgba(16, 18, 20, .12)); }
-.hit { position: absolute; top: 0; bottom: 0; width: 50%; }
-.hit.next { left: 0; cursor: w-resize; }
-.hit.prev { right: 0; cursor: e-resize; }
-
-footer { flex: none; display: flex; align-items: center; gap: 14px; padding: 8px 20px 14px; }
-footer button.turn { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 17px; background: rgba(255, 255, 255, .75); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; letter-spacing: .1em; }
-footer button.turn:disabled { opacity: .35; cursor: default; }
-footer input[type="range"] { flex: 1; min-width: 60px; accent-color: var(--zhu); direction: rtl; }
-footer output { flex: none; min-width: 7.5em; text-align: center; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-
-@media (max-width: 640px) {
-  header { padding: 10px 14px 6px; gap: 8px 10px; }
-  h1 { font-size: 24px; }
-  .note { flex-basis: 100%; order: 9; }
-  footer { padding: 6px 14px 12px; gap: 8px; }
-  footer button.turn { padding: 0 10px; }
-}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f1f2f3">
+<title>观我生 · 样书</title>
+<meta name="description" content="时藏《观我生》第七版样书：三张虚构的测试盘，各一函两册（本册、岁册），用线上同一个阅读器翻读。">
+<link rel="stylesheet" href="assets/app-AZVYTGGZ.css">
 </head>
 <body>
-<header>
-  <h1>观我生</h1>
-  <div class="seg" id="charts" role="group" aria-label="选盘"></div>
-  <div class="seg" id="vols" role="group" aria-label="选册"></div>
-  <span class="pillars" id="pillars"></span>
-  <span class="spacer"></span>
-  <span class="note">第七版样书 · 三张虚构的测试盘，不是真人 · 书由 AI 撰写 · 截自电脑上的阅读器</span>
-</header>
-<main id="stage">
-  <img id="spread" alt="">
-  <button type="button" class="hit next" aria-label="往后翻一面"></button>
-  <button type="button" class="hit prev" aria-label="往前翻一面"></button>
-</main>
-<footer>
-  <button type="button" class="turn" id="next">‹ 往后</button>
-  <input type="range" id="slider" min="0" value="0" aria-label="翻到第几面">
-  <output id="at"></output>
-  <button type="button" class="turn" id="prev">往前 ›</button>
-</footer>
-<script>
-const BOOKS = {"A":{"name":"甲盘","pillars":["己巳","乙亥","丙申","壬辰"],"yearGz":"丁未","vols":{"ben":[{"file":"a-ben-000.jpg","at":"第一叶 · 共五十二叶"},{"file":"a-ben-001.jpg","at":"第一叶 · 共五十二叶"},{"file":"a-ben-002.jpg","at":"第三叶 · 共五十二叶"},{"file":"a-ben-003.jpg","at":"第五叶 · 共五十二叶"},{"file":"a-ben-004.jpg","at":"第七叶 · 共五十二叶"},{"file":"a-ben-005.jpg","at":"第九叶 · 共五十二叶"},{"file":"a-ben-006.jpg","at":"第十一叶 · 共五十二叶"},{"file":"a-ben-007.jpg","at":"第十三叶 · 共五十二叶"},{"file":"a-ben-008.jpg","at":"第十五叶 · 共五十二叶"},{"file":"a-ben-009.jpg","at":"第十七叶 · 共五十二叶"},{"file":"a-ben-010.jpg","at":"第十九叶 · 共五十二叶"},{"file":"a-ben-011.jpg","at":"第二十一叶 · 共五十二叶"},{"file":"a-ben-012.jpg","at":"第二十三叶 · 共五十二叶"},{"file":"a-ben-013.jpg","at":"第二十五叶 · 共五十二叶"},{"file":"a-ben-014.jpg","at":"第二十七叶 · 共五十二叶"},{"file":"a-ben-015.jpg","at":"第二十九叶 · 共五十二叶"},{"file":"a-ben-016.jpg","at":"第三十一叶 · 共五十二叶"},{"file":"a-ben-017.jpg","at":"第三十三叶 · 共五十二叶"},{"file":"a-ben-018.jpg","at":"第三十五叶 · 共五十二叶"},{"file":"a-ben-019.jpg","at":"第三十七叶 · 共五十二叶"},{"file":"a-ben-020.jpg","at":"第三十九叶 · 共五十二叶"},{"file":"a-ben-021.jpg","at":"第四十一叶 · 共五十二叶"},{"file":"a-ben-022.jpg","at":"第四十三叶 · 共五十二叶"},{"file":"a-ben-023.jpg","at":"第四十五叶 · 共五十二叶"},{"file":"a-ben-024.jpg","at":"第四十七叶 · 共五十二叶"},{"file":"a-ben-025.jpg","at":"第四十九叶 · 共五十二叶"},{"file":"a-ben-026.jpg","at":"第五十一叶 · 共五十二叶"}],"sui":[{"file":"a-sui-000.jpg","at":"第一叶 · 共三十二叶"},{"file":"a-sui-001.jpg","at":"第一叶 · 共三十二叶"},{"file":"a-sui-002.jpg","at":"第三叶 · 共三十二叶"},{"file":"a-sui-003.jpg","at":"第五叶 · 共三十二叶"},{"file":"a-sui-004.jpg","at":"第七叶 · 共三十二叶"},{"file":"a-sui-005.jpg","at":"第九叶 · 共三十二叶"},{"file":"a-sui-006.jpg","at":"第十一叶 · 共三十二叶"},{"file":"a-sui-007.jpg","at":"第十三叶 · 共三十二叶"},{"file":"a-sui-008.jpg","at":"第十五叶 · 共三十二叶"},{"file":"a-sui-009.jpg","at":"第十七叶 · 共三十二叶"},{"file":"a-sui-010.jpg","at":"第十九叶 · 共三十二叶"},{"file":"a-sui-011.jpg","at":"第二十一叶 · 共三十二叶"},{"file":"a-sui-012.jpg","at":"第二十三叶 · 共三十二叶"},{"file":"a-sui-013.jpg","at":"第二十五叶 · 共三十二叶"},{"file":"a-sui-014.jpg","at":"第二十七叶 · 共三十二叶"},{"file":"a-sui-015.jpg","at":"第二十九叶 · 共三十二叶"},{"file":"a-sui-016.jpg","at":"第三十一叶 · 共三十二叶"}]}},"B":{"name":"乙盘","pillars":["乙亥","癸未","庚戌","癸未"],"yearGz":"丁未","vols":{"ben":[{"file":"b-ben-000.jpg","at":"第一叶 · 共五十四叶"},{"file":"b-ben-001.jpg","at":"第一叶 · 共五十四叶"},{"file":"b-ben-002.jpg","at":"第三叶 · 共五十四叶"},{"file":"b-ben-003.jpg","at":"第五叶 · 共五十四叶"},{"file":"b-ben-004.jpg","at":"第七叶 · 共五十四叶"},{"file":"b-ben-005.jpg","at":"第九叶 · 共五十四叶"},{"file":"b-ben-006.jpg","at":"第十一叶 · 共五十四叶"},{"file":"b-ben-007.jpg","at":"第十三叶 · 共五十四叶"},{"file":"b-ben-008.jpg","at":"第十五叶 · 共五十四叶"},{"file":"b-ben-009.jpg","at":"第十七叶 · 共五十四叶"},{"file":"b-ben-010.jpg","at":"第十九叶 · 共五十四叶"},{"file":"b-ben-011.jpg","at":"第二十一叶 · 共五十四叶"},{"file":"b-ben-012.jpg","at":"第二十三叶 · 共五十四叶"},{"file":"b-ben-013.jpg","at":"第二十五叶 · 共五十四叶"},{"file":"b-ben-014.jpg","at":"第二十七叶 · 共五十四叶"},{"file":"b-ben-015.jpg","at":"第二十九叶 · 共五十四叶"},{"file":"b-ben-016.jpg","at":"第三十一叶 · 共五十四叶"},{"file":"b-ben-017.jpg","at":"第三十三叶 · 共五十四叶"},{"file":"b-ben-018.jpg","at":"第三十五叶 · 共五十四叶"},{"file":"b-ben-019.jpg","at":"第三十七叶 · 共五十四叶"},{"file":"b-ben-020.jpg","at":"第三十九叶 · 共五十四叶"},{"file":"b-ben-021.jpg","at":"第四十一叶 · 共五十四叶"},{"file":"b-ben-022.jpg","at":"第四十三叶 · 共五十四叶"},{"file":"b-ben-023.jpg","at":"第四十五叶 · 共五十四叶"},{"file":"b-ben-024.jpg","at":"第四十七叶 · 共五十四叶"},{"file":"b-ben-025.jpg","at":"第四十九叶 · 共五十四叶"},{"file":"b-ben-026.jpg","at":"第五十一叶 · 共五十四叶"},{"file":"b-ben-027.jpg","at":"第五十三叶 · 共五十四叶"}],"sui":[{"file":"b-sui-000.jpg","at":"第一叶 · 共三十二叶"},{"file":"b-sui-001.jpg","at":"第一叶 · 共三十二叶"},{"file":"b-sui-002.jpg","at":"第三叶 · 共三十二叶"},{"file":"b-sui-003.jpg","at":"第五叶 · 共三十二叶"},{"file":"b-sui-004.jpg","at":"第七叶 · 共三十二叶"},{"file":"b-sui-005.jpg","at":"第九叶 · 共三十二叶"},{"file":"b-sui-006.jpg","at":"第十一叶 · 共三十二叶"},{"file":"b-sui-007.jpg","at":"第十三叶 · 共三十二叶"},{"file":"b-sui-008.jpg","at":"第十五叶 · 共三十二叶"},{"file":"b-sui-009.jpg","at":"第十七叶 · 共三十二叶"},{"file":"b-sui-010.jpg","at":"第十九叶 · 共三十二叶"},{"file":"b-sui-011.jpg","at":"第二十一叶 · 共三十二叶"},{"file":"b-sui-012.jpg","at":"第二十三叶 · 共三十二叶"},{"file":"b-sui-013.jpg","at":"第二十五叶 · 共三十二叶"},{"file":"b-sui-014.jpg","at":"第二十七叶 · 共三十二叶"},{"file":"b-sui-015.jpg","at":"第二十九叶 · 共三十二叶"},{"file":"b-sui-016.jpg","at":"第三十一叶 · 共三十二叶"}]}},"C":{"name":"丙盘","pillars":["壬子","癸卯","己亥"],"yearGz":"丁未","vols":{"ben":[{"file":"c-ben-000.jpg","at":"第一叶 · 共五十一叶"},{"file":"c-ben-001.jpg","at":"第一叶 · 共五十一叶"},{"file":"c-ben-002.jpg","at":"第三叶 · 共五十一叶"},{"file":"c-ben-003.jpg","at":"第五叶 · 共五十一叶"},{"file":"c-ben-004.jpg","at":"第七叶 · 共五十一叶"},{"file":"c-ben-005.jpg","at":"第九叶 · 共五十一叶"},{"file":"c-ben-006.jpg","at":"第十一叶 · 共五十一叶"},{"file":"c-ben-007.jpg","at":"第十三叶 · 共五十一叶"},{"file":"c-ben-008.jpg","at":"第十五叶 · 共五十一叶"},{"file":"c-ben-009.jpg","at":"第十七叶 · 共五十一叶"},{"file":"c-ben-010.jpg","at":"第十九叶 · 共五十一叶"},{"file":"c-ben-011.jpg","at":"第二十一叶 · 共五十一叶"},{"file":"c-ben-012.jpg","at":"第二十三叶 · 共五十一叶"},{"file":"c-ben-013.jpg","at":"第二十五叶 · 共五十一叶"},{"file":"c-ben-014.jpg","at":"第二十七叶 · 共五十一叶"},{"file":"c-ben-015.jpg","at":"第二十九叶 · 共五十一叶"},{"file":"c-ben-016.jpg","at":"第三十一叶 · 共五十一叶"},{"file":"c-ben-017.jpg","at":"第三十三叶 · 共五十一叶"},{"file":"c-ben-018.jpg","at":"第三十五叶 · 共五十一叶"},{"file":"c-ben-019.jpg","at":"第三十七叶 · 共五十一叶"},{"file":"c-ben-020.jpg","at":"第三十九叶 · 共五十一叶"},{"file":"c-ben-021.jpg","at":"第四十一叶 · 共五十一叶"},{"file":"c-ben-022.jpg","at":"第四十三叶 · 共五十一叶"},{"file":"c-ben-023.jpg","at":"第四十五叶 · 共五十一叶"},{"file":"c-ben-024.jpg","at":"第四十七叶 · 共五十一叶"},{"file":"c-ben-025.jpg","at":"第四十九叶 · 共五十一叶"},{"file":"c-ben-026.jpg","at":"第五十一叶 · 共五十一叶"}],"sui":[{"file":"c-sui-000.jpg","at":"第一叶 · 共三十二叶"},{"file":"c-sui-001.jpg","at":"第一叶 · 共三十二叶"},{"file":"c-sui-002.jpg","at":"第三叶 · 共三十二叶"},{"file":"c-sui-003.jpg","at":"第五叶 · 共三十二叶"},{"file":"c-sui-004.jpg","at":"第七叶 · 共三十二叶"},{"file":"c-sui-005.jpg","at":"第九叶 · 共三十二叶"},{"file":"c-sui-006.jpg","at":"第十一叶 · 共三十二叶"},{"file":"c-sui-007.jpg","at":"第十三叶 · 共三十二叶"},{"file":"c-sui-008.jpg","at":"第十五叶 · 共三十二叶"},{"file":"c-sui-009.jpg","at":"第十七叶 · 共三十二叶"},{"file":"c-sui-010.jpg","at":"第十九叶 · 共三十二叶"},{"file":"c-sui-011.jpg","at":"第二十一叶 · 共三十二叶"},{"file":"c-sui-012.jpg","at":"第二十三叶 · 共三十二叶"},{"file":"c-sui-013.jpg","at":"第二十五叶 · 共三十二叶"},{"file":"c-sui-014.jpg","at":"第二十七叶 · 共三十二叶"},{"file":"c-sui-015.jpg","at":"第二十九叶 · 共三十二叶"},{"file":"c-sui-016.jpg","at":"第三十一叶 · 共三十二叶"}]}}};
-const NAME = { ben: '本册', sui: '岁册' };
-let state = { c: 'a', v: 'ben', i: 0 };
-const $ = (id) => document.getElementById(id);
-const list = () => BOOKS[state.c.toUpperCase()].vols[state.v];
-const han = (n) => { const d = '〇一二三四五六七八九'; if (n < 10) return d[n]; const t = Math.floor(n / 10), o = n % 10; return (t > 1 ? d[t] : '') + '十' + (o ? d[o] : ''); };
-
-function fromHash() {
-  const m = location.hash.match(/^#([abc])-(ben|sui)(?:-(\d+))?$/);
-  if (m) state = { c: m[1], v: m[2], i: Number(m[3] ?? 0) };
-}
-function toHash() { history.replaceState(null, '', `#${state.c}-${state.v}-${state.i}`); }
-
-function chrome() {
-  const book = BOOKS[state.c.toUpperCase()];
-  $('charts').innerHTML = Object.entries(BOOKS).map(([k, b]) => `<button type="button" data-c="${k.toLowerCase()}" aria-pressed="${k.toLowerCase() === state.c}">${b.name}</button>`).join('');
-  $('vols').innerHTML = ['ben', 'sui'].map((v) => `<button type="button" data-v="${v}" aria-pressed="${v === state.v}">${v === 'sui' ? book.yearGz + '岁册' : '本册'}</button>`).join('');
-  $('pillars').textContent = book.pillars.join(' ');
-}
-function show() {
-  const l = list();
-  state.i = Math.max(0, Math.min(l.length - 1, state.i));
-  const s = l[state.i];
-  $('spread').src = `img/${s.file}`;
-  $('spread').alt = `${BOOKS[state.c.toUpperCase()].name}${NAME[state.v]}，${s.at}`;
-  $('slider').max = String(l.length - 1);
-  $('slider').value = String(state.i);
-  $('at').textContent = `第${han(state.i + 1)}面 · 共${han(l.length)}面`;
-  $('next').disabled = state.i >= l.length - 1;
-  $('prev').disabled = state.i <= 0;
-  toHash();
-  // 先把前后两面取下来，翻得快
-  for (const j of [state.i + 1, state.i - 1]) if (l[j]) { const im = new Image(); im.src = `img/${l[j].file}`; }
-}
-const turn = (d) => { state.i += d; show(); };
-
-document.addEventListener('click', (e) => {
-  const t = e.target.closest('button[data-c], button[data-v]');
-  if (!t) return;
-  if (t.dataset.c) state = { c: t.dataset.c, v: state.v, i: 0 };
-  if (t.dataset.v) state = { c: state.c, v: t.dataset.v, i: 0 };
-  chrome(); show();
-});
-$('next').onclick = () => turn(1);
-$('prev').onclick = () => turn(-1);
-document.querySelector('.hit.next').onclick = () => turn(1);
-document.querySelector('.hit.prev').onclick = () => turn(-1);
-$('slider').oninput = (e) => { state.i = Number(e.target.value); show(); };
-// 竖排的书往左翻：← 往后，→ 往前
-addEventListener('keydown', (e) => {
-  if (e.target.matches?.('input')) return;
-  if (e.key === 'ArrowLeft' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); turn(1); }
-  if (e.key === 'ArrowRight' || e.key === 'PageUp') { e.preventDefault(); turn(-1); }
-});
-// 手机上横着拨：往右拨是往后翻，和书里一样
-let sx = null;
-$('stage').addEventListener('touchstart', (e) => { sx = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
-$('stage').addEventListener('touchend', (e) => {
-  if (sx === null) return;
-  const dx = e.changedTouches[0].clientX - sx; sx = null;
-  if (Math.abs(dx) > 40) turn(dx > 0 ? 1 : -1);
-});
-addEventListener('hashchange', () => { fromHash(); chrome(); show(); });
-fromHash(); chrome(); show();
-</script>
+<div id="root"></div>
+<noscript><p style="padding:24px;font-family:serif">这本样书要开着 JavaScript 才翻得动。</p></noscript>
+<script type="module" src="assets/app-6XTKL6QS.js"></script>
 </body>
 </html>
